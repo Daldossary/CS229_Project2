@@ -8,7 +8,7 @@ using std::vector;
 using std::string;
 using Matrix = vector<vector<double>>;
 
-// By default, skipHeader is set to true
+// changed so that it can skip headers automatically
 Matrix parseCSV(const string& filename, bool skipHeader = true);
 
 #endif

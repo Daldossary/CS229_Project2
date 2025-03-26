@@ -12,33 +12,33 @@ using std::vector;
 int main() {
     cout << "Testing Gaussian Basis Functions" << endl;
     
-    // ------------------ Test 1: Single Value Transformation ------------------
-    double x = 5.0;
-    vector<double> fixedCenters = {2.0, 4.0, 6.0, 8.0};
-    double s = 1.0;
+    // --- single value transformation test --- //
+    double x = 5.0; // single data point
+    vector<double> fixedCenters = {2.0, 4.0, 6.0, 8.0}; // fixed centers
+    double s = 1.0; // common slope for all basis functions
     
-    vector<double> features = computeGaussianBasisFeatures(x, fixedCenters, s);
-    cout << "Gaussian features for x = " << x << ":" << endl;
+    vector<double> features = calcGaussBasisFeatures(x, fixedCenters, s); // calculate features
+    cout << "Gaussian features for x = " << x << ":" << endl; // print features
     for (size_t i = 0; i < features.size(); ++i) {
-        cout << "Center " << fixedCenters[i] << ": " << features[i] << endl;
+        cout << "Center " << fixedCenters[i] << ": " << features[i] << endl; 
     }
     
-    // ------------------ Test 2: Automatic Center Generation ------------------
-    vector<double> sampleData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int numCenters = 5;
-    vector<double> autoCenters = generateCenters(sampleData, numCenters);
-    cout << "Automatically generated centers:" << endl;
+    // --- automatic center generation test --- //
+    vector<double> sampleData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // sample data
+    int numCenters = 5; // number of centers
+    vector<double> autoCenters = genCenters(sampleData, numCenters); // generate centers
+    cout << "Automatically generated centers:" << endl; // print centers
     for (double center : autoCenters) {
         cout << center << " ";
     }
     cout << endl;
     
-    // ------------------ Test 3: Gaussian Basis Matrix Transformation --------
-    // Create a sample matrix X (each row is a univariate data point).
-    Matrix X = { {1.0}, {3.0}, {5.0}, {7.0}, {9.0} };
-    Matrix transformed = computeGaussianBasisFeaturesMatrix(X, autoCenters, s);
+    // --- matrix transformation test --- //
+    Matrix X = { {1.0}, {3.0}, {5.0}, {7.0}, {9.0} }; // sample matrix X (each row is univariate data point).
+    Matrix transformed = calcGaussBasisFeaturesM(X, autoCenters, s); // calculate features
+
     
-    // Write the transformed features to a CSV file for visualization.
+    // --- writing transformed features to CSV file for visualization --- //
     string csvFilename = "./results/gaussian_basis_features.csv";
     std::ofstream outFile(csvFilename);
     if (!outFile) {
@@ -46,14 +46,14 @@ int main() {
         return 1;
     }
     
-    // Write header.
+    // writing a header.
     outFile << "x";
     for (size_t j = 0; j < autoCenters.size(); ++j) {
         outFile << ",phi" << j;
     }
     outFile << "\n";
     
-    // Write each data value and its corresponding Gaussian features.
+    // writing each data value and its gaussian features.
     for (size_t i = 0; i < X.size(); ++i) {
         outFile << X[i][0];
         for (size_t j = 0; j < transformed[i].size(); ++j) {

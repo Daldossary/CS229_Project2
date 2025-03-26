@@ -12,34 +12,34 @@ using std::vector;
 int main() {
     cout << "Testing Sigmoidal Basis Functions" << endl;
     
-    // ------------------ Test 1: Single Value Transformation ------------------
-    double x = 5.0;
-    vector<double> fixedCenters = {2.0, 4.0, 6.0, 8.0};
+    // --- single value transformation test --- //
+    double x = 5.0; // single data point
+    vector<double> fixedCenters = {2.0, 4.0, 6.0, 8.0}; // fixed centers
     double s = 1.0; // common slope for all basis functions
-    vector<double> features = computeSigmoidalBasisFeatures(x, fixedCenters, s);
+    vector<double> features = calcSigmoidalBasisFeatures(x, fixedCenters, s); // calculate features
     
-    cout << "Sigmoidal features for x = " << x << ":" << endl;
-    for (size_t i = 0; i < features.size(); ++i) {
-        cout << "Center " << fixedCenters[i] << ": " << features[i] << endl;
+    cout << "Sigmoidal features for x = " << x << ":" << endl; // print features
+    for (size_t i = 0; i < features.size(); ++i) { // loop through features
+        cout << "Center " << fixedCenters[i] << ": " << features[i] << endl; // print feature
     }
     
-    // ------------------ Test 2: Automatic Center Generation ------------------
-    vector<double> sampleData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int numCenters = 5;
-    vector<double> autoCenters = generateSigmoidCenters(sampleData, numCenters);
+    // --- automatic center generation test --- //
+    vector<double> sampleData = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // sample data
+    int numCenters = 5; // number of centers
+    vector<double> autoCenters = genSigmoidCenters(sampleData, numCenters); // generate centers
     
-    cout << "Automatically generated centers:" << endl;
-    for (double center : autoCenters) {
-        cout << center << " ";
+    cout << "Automatically generated centers:" << endl; // print centers
+    for (double center : autoCenters) { // loop through centers
+        cout << center << " "; // print center
     }
-    cout << endl;
+    cout << endl; // print newline
     
-    // ------------------ Test 3: Sigmoidal Basis Matrix Transformation --------
-    // Create a sample matrix X (each row is a univariate data point).
-    Matrix X = { {1.0}, {3.0}, {5.0}, {7.0}, {9.0} };
-    Matrix transformed = computeSigmoidalBasisFeaturesMatrix(X, autoCenters, s);
-    
-    // Write the transformed features to a CSV file for visualization.
+    // --- matrix transformation test --- //
+    Matrix X = { {1.0}, {3.0}, {5.0}, {7.0}, {9.0} }; // sample matrix X (each row is univariate data point)
+    Matrix transformed = calcSigmoidalBasisFeaturesM(X, autoCenters, s); // calculate features
+
+
+    // --- writing transformed features to CSV file for visualization --- //
     string csvFilename = "./results/sigmoidal_basis_features.csv";
     std::ofstream outFile(csvFilename);
     if (!outFile) {
@@ -47,14 +47,14 @@ int main() {
         return 1;
     }
     
-    // Write header.
+    // writing a header.
     outFile << "x";
     for (size_t j = 0; j < autoCenters.size(); ++j) {
         outFile << ",phi" << j;
     }
     outFile << "\n";
     
-    // Write each data value and its corresponding sigmoidal features.
+    // writing each data value and its sigmoidal features.
     for (size_t i = 0; i < X.size(); ++i) {
         outFile << X[i][0];
         for (size_t j = 0; j < transformed[i].size(); ++j) {

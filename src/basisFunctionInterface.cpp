@@ -3,50 +3,52 @@
 #include <numeric>
 #include <algorithm>
 
-// Helper function to extract a specific column from X (here, univariate data assumed in column 0)
-vector<double> extractColumn(const Matrix &X, size_t colIndex = 0) {
-    vector<double> col;
-    for (const auto &row : X) {
-        if (colIndex < row.size())
-            col.push_back(row[colIndex]);
+// helper function to extract specific column from X (univariate data assumed in column 0)
+vector<double> extractCol(const Matrix &X, size_t colIndex = 0) {
+    vector<double> col; // extracted column
+    for (const auto &row : X) { // iterate over rows
+        if (colIndex < row.size()) // check if column index is valid
+            col.push_back(row[colIndex]); // add the element to the column
     }
-    return col;
+    return col; // return extracted column
 }
 
-Matrix transformFeatures(const Matrix &X, BasisFunctionType choice, double param1, double param2) {
+Matrix transformFeatures(const Matrix &X, basisFunctionType choice, double p1, double p2) {
     Matrix transformed;
     switch (choice) {
-        case BasisFunctionType::POLYNOMIAL: {
-            // param1 is the degree (an integer)
-            int degree = static_cast<int>(param1);
-            // Use the existing polynomial feature generation function from polyReg.
-            // Note: genPolyFeatures expects a non-const Matrix, so we use a cast.
+        case basisFunctionType::POLYNOMIAL: {
+            // p1 = degree of polynomial
+            // cast degree to an integer
+            int degree = static_cast<int>(p1);
+
+            // Using existing polynomial feature generation function from polyReg.
+            // const_cast is used to remove the const qualifier from X.
             transformed = genPolyFeatures(const_cast<Matrix &>(X), degree);
             break;
         }
-        case BasisFunctionType::GAUSSIAN: {
-            // param1: number of centers (an integer)
-            int numCenters = static_cast<int>(param1);
-            // param2: scale parameter for the Gaussian basis
-            double s = param2;
-            // Extract the univariate data column from X.
-            vector<double> dataCol = extractColumn(X, 0);
-            // Automatically generate centers based on the data range.
-            vector<double> centers = generateCenters(dataCol, numCenters);
-            // Compute the Gaussian basis transformed features.
-            transformed = computeGaussianBasisFeaturesMatrix(X, centers, s);
+        case basisFunctionType::GAUSSIAN: {
+            // p1 = number of centers (integer)
+            int numCenters = static_cast<int>(p1);
+            // p2 = scale parameter for gaussian basis
+            double scale = p2;
+            // get univariate data column from X
+            vector<double> dataCol = extractCol(X, 0);
+            // generate centers based on data range
+            vector<double> centers = genCenters(dataCol, numCenters);
+            // calc gaussian basis transformed features.
+            transformed = calcGaussBasisFeaturesM(X, centers, scale);
             break;
         }
-        case BasisFunctionType::SIGMOIDAL: {
-            // param1: number of centers (an integer)
-            int numCenters = static_cast<int>(param1);
-            // param2: slope parameter for the sigmoidal basis
-            double slope = param2;
-            vector<double> dataCol = extractColumn(X, 0);
-            // Generate centers automatically for the sigmoidal function.
-            vector<double> centers = generateSigmoidCenters(dataCol, numCenters);
-            // Compute the sigmoidal basis transformed features.
-            transformed = computeSigmoidalBasisFeaturesMatrix(X, centers, slope);
+        case basisFunctionType::SIGMOIDAL: {
+            // p1 = number of centers (integer)
+            int numCenters = static_cast<int>(p1);
+            // p2 = slope for sigmoidal basis
+            double slope = p2;
+            vector<double> dataCol = extractCol(X, 0);
+            // generate centers for sigmoidal function.
+            vector<double> centers = genSigmoidCenters(dataCol, numCenters);
+            // calc sigmoidal basis transformed features.
+            transformed = calcSigmoidalBasisFeaturesM(X, centers, slope);
             break;
         }
         default:

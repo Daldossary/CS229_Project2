@@ -11,52 +11,53 @@ using std::string;
 using std::vector;
 
 int main() {
-    // Prepare a sample input matrix X (univariate data points: one feature per row).
+
+    //sample input matrix X (univariate data points: one feature per row)
     Matrix X = { {1.0}, {2.0}, {3.0}, {4.0}, {5.0}, {6.0}, {7.0}, {8.0}, {9.0}, {10.0} };
     
-    // Display menu and get user selection.
-    cout << "Select the basis function to use for the regression model:" << endl;
-    cout << "1. Polynomial" << endl;
-    cout << "2. Gaussian" << endl;
-    cout << "3. Sigmoidal" << endl;
+    // display menu and get user choice
+    cout << "Select the basis function for the regression model:" << endl;
+    cout << "1. Polynomial Basis Function" << endl;
+    cout << "2. Gaussian Basis Function" << endl;
+    cout << "3. Sigmoidal Basis Function" << endl;
     cout << "Enter your choice (1/2/3): ";
     
-    int choiceInput = 0;
-    cin >> choiceInput;
-    BasisFunctionType selectedFunction = static_cast<BasisFunctionType>(choiceInput);
+    int choiceInput = 0; // user choice
+    cin >> choiceInput; // read user choice
+    basisFunctionType selectedBasis = static_cast<basisFunctionType>(choiceInput); // convert to enum
     
-    double param1 = 0.0, param2 = 0.0;
+    double p1 = 0.0, p2 = 0.0;
     
-    // Ask for additional parameters based on the choice.
-    switch (selectedFunction) {
-        case BasisFunctionType::POLYNOMIAL:
+    // ask for parameters based on choice.
+    switch (selectedBasis) {
+        case basisFunctionType::POLYNOMIAL:
             cout << "Enter polynomial degree (integer): ";
-            cin >> param1;
-            cout << "Polynomial basis function selected with degree " << param1 << endl;
+            cin >> p1;
+            cout << "Polynomial basis function selected with degree " << p1 << endl;
             break;
-        case BasisFunctionType::GAUSSIAN:
+        case basisFunctionType::GAUSSIAN:
             cout << "Enter number of centers for Gaussian basis (integer): ";
-            cin >> param1;
+            cin >> p1;
             cout << "Enter scale (s) for Gaussian basis: ";
-            cin >> param2;
-            cout << "Gaussian basis function selected with " << param1 << " centers and scale " << param2 << endl;
+            cin >> p2;
+            cout << "Gaussian basis function selected with " << p1 << " centers and scale " << p2 << endl;
             break;
-        case BasisFunctionType::SIGMOIDAL:
+        case basisFunctionType::SIGMOIDAL:
             cout << "Enter number of centers for Sigmoidal basis (integer): ";
-            cin >> param1;
+            cin >> p1;
             cout << "Enter slope parameter for Sigmoidal basis: ";
-            cin >> param2;
-            cout << "Sigmoidal basis function selected with " << param1 << " centers and slope " << param2 << endl;
+            cin >> p2;
+            cout << "Sigmoidal basis function selected with " << p1 << " centers and slope " << p2 << endl;
             break;
         default:
             cout << "Invalid selection. Exiting." << endl;
             return 1;
     }
     
-    // Transform the input features using the selected basis function.
-    Matrix transformed = transformFeatures(X, selectedFunction, param1, param2);
+    // apply transform on input features using selected basis function
+    Matrix transformed = transformFeatures(X, selectedBasis, p1, p2);
     
-    // Output the transformed feature matrix to a CSV file for visualization.
+    // output transformed feature matrix to CSV file for visualization
     string outputFilename = "./results/basis_function_choice.csv";
     std::ofstream outFile(outputFilename);
     if (!outFile) {
@@ -64,7 +65,9 @@ int main() {
         return 1;
     }
     
-    // Write header: first column "x", then one column per basis function (phi0, phi1, ...)
+    // writing header: 
+    // first column "x"
+    // one column per basis function (phi0, phi1, etc...)
     outFile << "x";
     if (!transformed.empty()) {
         for (size_t j = 0; j < transformed[0].size(); ++j)
