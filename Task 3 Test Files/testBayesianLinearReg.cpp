@@ -2,9 +2,9 @@
 #include <fstream>
 #include <vector>
 #include "./src/bayesianLinearReg.h"
-#include "./src/basisFunctionInterface.h"  // Provides transformFeatures() and BasisFunctionType
-#include "./src/polyReg.h"  // For genPolyFeatures (polynomial basis functions)
-#include "./src/matrixOperations.h"  // For matrix utilities
+#include "./src/basisFunctionInterface.h"  // transformFeatures() and basisFunctionType
+#include "./src/polyReg.h"  // genPolyFeatures (polynomial basis functions)
+#include "./src/matrixOperations.h"  // matrix utilities
 using std::cout;
 using std::cin;
 using std::endl;
@@ -15,31 +15,31 @@ using std::string;
 int main() {
     cout << "Testing Bayesian Linear Regression with Basis Function Transformation" << endl;
     
-    // Create a simple synthetic univariate dataset.
-    // Let x = 1, 2, …, 10 and target t = 2*x + 1.
-    Matrix X;
-    vector<double> targets;
-    for (int i = 1; i <= 10; i++) {
-        X.push_back({static_cast<double>(i)});
-        targets.push_back(2.0 * i + 1.0);
+    // creating simple synthetic univariate dataset.
+    //  x = 1, 2, …, 10 and target t = 2*x + 1.
+    Matrix X; // feature matrix
+    vector<double> targets; // target vector
+    for (int i = 1; i <= 10; i++) { // x = 1, 2, …, 10
+        X.push_back({static_cast<double>(i)}); // add x to feature matrix
+        targets.push_back(2.0 * i + 1.0); // add target to target vector
     }
     
-    // In this test, we choose to use polynomial basis functions (degree 2).
-    // (You could also use Gaussian or Sigmoidal by changing the interface parameters.)
+    // using polynomial basis functions (degree 2).
+    // can also use other basis functions like Gaussian, sigmoid, etc.
     int degree = 2;
-    Matrix Phi = genPolyFeatures(X, degree);
+    Matrix phi = genPolyFeatures(X, degree);
     
-    // Write the design matrix (after transformation) to a CSV file.
+    // writing design matrix (after transformation) to a CSV file.
     string designFilename = "./results/design_matrix.csv";
     std::ofstream designFile(designFilename);
     if (!designFile) {
         cout << "Error: Could not open " << designFilename << " for writing." << endl;
         return 1;
     }
-    for (size_t i = 0; i < Phi.size(); i++) {
-        for (size_t j = 0; j < Phi[i].size(); j++) {
-            designFile << Phi[i][j];
-            if (j != Phi[i].size() - 1)
+    for (size_t i = 0; i < phi.size(); i++) { 
+        for (size_t j = 0; j < phi[i].size(); j++) { 
+            designFile << phi[i][j]; 
+            if (j != phi[i].size() - 1)
                 designFile << ",";
         }
         designFile << "\n";
@@ -47,19 +47,19 @@ int main() {
     designFile.close();
     cout << "Design matrix written to " << designFilename << endl;
     
-    // Set the hyperparameters for the Bayesian linear regression model.
-    double alpha = 1e-3;  // Prior precision.
-    double beta = 1e+3;   // Likelihood (noise) precision.
+    // setting hyperparameters for bayesian linear regression 
+    double alpha = 1e-3;  // prior precision.
+    double beta = 1e+3;   // likelihood (noise) precision.
     
-    BayesianLinearRegression blr(alpha, beta);
-    blr.fit(Phi, targets);
+    bayesianLinearRegression blr(alpha, beta); // creating bayesian linear regression object
+    blr.fit(phi, targets); // fitting model
     
-    // Predict on the training data.
-    vector<double> predictions = blr.predict(Phi);
-    vector<double> predVars = blr.predictiveVariance(Phi);
+    // predict on training data
+    vector<double> predictions = blr.predict(phi); 
+    vector<double> predVars = blr.predictiveVar(phi);
     vector<double> weights = blr.getWeights();
     
-    // Write predictions and predictive variances to a CSV file.
+    // writing predictions and predictive variances to a CSV file.
     string predFilename = "./results/blr_predictions.csv";
     std::ofstream predFile(predFilename);
     if (!predFile) {

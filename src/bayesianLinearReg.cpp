@@ -1,5 +1,5 @@
 #include "bayesianLinearReg.h"
-#include "matrixOperations.h"  // for transposeM, multMs, invertM
+#include "matrixOperations.h"
 #include <vector>
 #include <cmath>
 #include <cassert>
@@ -7,83 +7,85 @@
 using std::vector;
 using Matrix = std::vector<std::vector<double>>;
 
-// Helper: Multiply a matrix A (size m x n) by a vector v (size n) -> returns vector of length m.
+// helper function to multiply matrix A (m x n) by vector v (n)
+// returns vector of length m.
 static vector<double> multMatVec(const Matrix &A, const vector<double> &v) {
-    size_t m = A.size();
-    size_t n = A[0].size();
-    vector<double> result(m, 0.0);
-    for (size_t i = 0; i < m; ++i)
-        for (size_t j = 0; j < n; ++j)
-            result[i] += A[i][j] * v[j];
-    return result;
+    size_t m = A.size(); // number of rows
+    size_t n = A[0].size(); // number of columns
+    vector<double> result(m, 0.0); // result vector
+    for (size_t i = 0; i < m; ++i) // for each row
+        for (size_t j = 0; j < n; ++j) // for each column
+            result[i] += A[i][j] * v[j]; // multiply and add
+    return result; // return result
 }
 
-// Helper: Create a d x d identity matrix.
-static Matrix identityMatrix(size_t d) {
-    Matrix I(d, vector<double>(d, 0.0));
-    for (size_t i = 0; i < d; ++i)
-        I[i][i] = 1.0;
-    return I;
+// helper function to make d x d identity matrix.
+static Matrix idMatrix(size_t d) {
+    Matrix I(d, vector<double>(d, 0.0)); // create d x d matrix
+    for (size_t i = 0; i < d; ++i) // for each row
+        I[i][i] = 1.0; // set diagonal to 1
+    return I; // return identity matrix
 }
 
-BayesianLinearRegression::BayesianLinearRegression(double alpha, double beta)
-    : alpha_(alpha), beta_(beta) {}
+bayesianLinearRegression::bayesianLinearRegression(double alpha, double beta) 
+    : alpha_(alpha), beta_(beta) {} // constructor
 
-void BayesianLinearRegression::fit(const Matrix &Phi, const vector<double> &t) {
-    // Phi is m x d.
-    // 1. Compute the transpose of Phi.
-    Matrix PhiT = transposeM(const_cast<Matrix&>(Phi));
-    // 2. Compute PhiᵀΦ.
-    Matrix PhiTPhi = multMs(PhiT, const_cast<Matrix&>(Phi));
-    size_t d = PhiTPhi.size();
-    // 3. Compute A = α I + β (PhiᵀΦ).
-    Matrix I = identityMatrix(d);
-    Matrix A(d, vector<double>(d, 0.0));
-    for (size_t i = 0; i < d; ++i)
-        for (size_t j = 0; j < d; ++j)
-            A[i][j] = beta_ * PhiTPhi[i][j] + (i == j ? alpha_ : 0.0);
+void bayesianLinearRegression::fit(const Matrix &phi, const vector<double> &t) {
+    // phi (m x d)
+    // transpose of phi
+    Matrix phiT = transposeM(const_cast<Matrix&>(phi));
+    // calc phi transpose times phi
+    Matrix phiTphi = multMs(phiT, const_cast<Matrix&>(phi));
+    size_t d = phiTphi.size(); // number of columns
+    // calc A = (alpha * identity) + (beta * (phi^Traspose * phi)
+    Matrix I = idMatrix(d); // create identity matrix
+    Matrix A(d, vector<double>(d, 0.0)); // create d x d matrix
+    for (size_t i = 0; i < d; ++i) // for each row
+        for (size_t j = 0; j < d; ++j) // for each column
+            A[i][j] = beta_ * phiTphi[i][j] + (i == j ? alpha_ : 0.0); // set A
 
-    // 4. Compute the posterior covariance S_N = A⁻¹.
-    S_N_ = invertM(A);
+    // calc posterior covariance s_N = A inverse.
+    s_N_ = invertM(A);
 
-    // 5. Compute the posterior mean: m_N = β S_N Φᵀ t.
-    // Convert vector t to a column matrix.
-    Matrix tM(t.size(), vector<double>(1, 0.0));
-    for (size_t i = 0; i < t.size(); ++i)
-        tM[i][0] = t[i];
-    Matrix PhiTt = multMs(PhiT, tM);  // d x 1 matrix.
-    Matrix m_N_mat = multMs(S_N_, PhiTt);  // d x 1 matrix.
-    m_N_.resize(m_N_mat.size());
-    for (size_t i = 0; i < m_N_mat.size(); ++i)
-        m_N_[i] = beta_ * m_N_mat[i][0];
+    // calc posterior mean: m_N = beta * s_N * phi^T * t
+    Matrix tM(t.size(), vector<double>(1, 0.0)); // converting vector t to column matrix
+    for (size_t i = 0; i < t.size(); ++i) // for each element in t
+        tM[i][0] = t[i]; // set element in column matrix
+    Matrix phiTt = multMs(phiT, tM);  // d x 1 matrix.
+    Matrix m_N_mat = multMs(s_N_, phiTt);  // d x 1 matrix.
+    m_N_.resize(m_N_mat.size()); // resize m_N_ to d
+    for (size_t i = 0; i < m_N_mat.size(); ++i) // for each element in m_N_mat
+        m_N_[i] = beta_ * m_N_mat[i][0]; // set element in m_N_
 }
 
-vector<double> BayesianLinearRegression::predict(const Matrix &Phi_new) const {
-    // For each new data point (row of Phi_new), compute: prediction = m_Nᵀ φ(x)
-    vector<double> predictions;
-    for (size_t i = 0; i < Phi_new.size(); ++i) {
-        double pred = 0.0;
-        for (size_t j = 0; j < m_N_.size(); ++j)
-            pred += m_N_[j] * Phi_new[i][j];
-        predictions.push_back(pred);
+vector<double> bayesianLinearRegression::predict(const Matrix &phiNew) const {
+    // For each new data point (row in phiNew)
+    // calc prediction = m_N^T * phi(x)
+    vector<double> predictions; // vector to store predictions
+    for (size_t i = 0; i < phiNew.size(); ++i) { // for each row in phiNew
+        double pred = 0.0; // create prediction
+        for (size_t j = 0; j < m_N_.size(); ++j) // for each element in m_N_
+            pred += m_N_[j] * phiNew[i][j]; // multiply and add
+        predictions.push_back(pred); // add prediction to vector
     }
-    return predictions;
+    return predictions; // return vector of predictions
 }
 
-vector<double> BayesianLinearRegression::predictiveVariance(const Matrix &Phi_new) const {
-    // For each new data point, compute: variance = 1/β + φ(x)ᵀ S_N φ(x)
-    vector<double> variances;
-    for (size_t i = 0; i < Phi_new.size(); ++i) {
-        vector<double> phi = Phi_new[i];
-        vector<double> S_phi = multMatVec(S_N_, phi);
-        double dot = 0.0;
-        for (size_t j = 0; j < phi.size(); ++j)
-            dot += phi[j] * S_phi[j];
-        variances.push_back(1.0 / beta_ + dot);
+vector<double> bayesianLinearRegression::predictiveVar(const Matrix &phiNew) const {
+    // For each new data point
+    // calc variance = 1/beta + phi(x)^Transpose * s_N * phi(x)
+    vector<double> variances; // vector to store variances
+    for (size_t i = 0; i < phiNew.size(); ++i) { // for each row in phiNew
+        vector<double> phi = phiNew[i]; // get row
+        vector<double> sPhi = multMatVec(s_N_, phi); // s_N * phi(x)
+        double dot = 0.0; // dot product
+        for (size_t j = 0; j < phi.size(); ++j) // for each element in phi
+            dot += phi[j] * sPhi[j]; // multiply and add
+        variances.push_back(1.0 / beta_ + dot); // add variance to vector
     }
-    return variances;
+    return variances; // return vector of variances
 }
 
-vector<double> BayesianLinearRegression::getWeights() const {
+vector<double> bayesianLinearRegression::getWeights() const {
     return m_N_;
 }
