@@ -40,7 +40,7 @@ int main() {
     const double alpha = 1e-3;
     const double beta  = 1e+3;
 
-    BayesianLinearRegression blr(alpha, beta);
+    bayesianLinearRegression blr(alpha, beta);
     blr.fit(Phi, t);
 
     // Write out the learned posterior weight parameters (the posterior mean mₙ).

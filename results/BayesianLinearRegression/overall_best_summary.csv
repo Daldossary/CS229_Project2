@@ -1,0 +1,10 @@
+Dataset,BasisType,TrainingMSE,Alpha,Beta
+synthetic,Polynomial,0.953164,1e-05,10000
+synthetic,Sigmoidal,0.864901,1,10
+synthetic,Gaussian,1.21983,1,10
+wine_red,Polynomial,0.397138,10,10
+wine_red,Sigmoidal,0.637987,1,10
+wine_red,Gaussian,0.637497,10,10
+forestfires,Polynomial,3287.19,10,10
+forestfires,Sigmoidal,3440.11,10,100
+forestfires,Gaussian,3434.05,10,10

@@ -1,0 +1,16 @@
+=== Running Synthetic Regression Experiments with All Basis Functions ===
+synthetic experiment (Polynomial basis) completed. Best Alpha = 1e-05, Best Beta = 10000, Training MSE = 0.953164
+synthetic experiment (Sigmoidal basis) completed. Best Alpha = 1, Best Beta = 10, Training MSE = 0.864901
+synthetic experiment (Gaussian basis) completed. Best Alpha = 1, Best Beta = 10, Training MSE = 1.21983
+Synthetic best basis: Sigmoidal with Training MSE = 0.864901
+=== Running Wine Quality (Red) Regression Experiments with All Basis Functions ===
+wine_red experiment (Polynomial basis) completed. Best Alpha = 10, Best Beta = 10, Training MSE = 0.397138
+wine_red experiment (Sigmoidal basis) completed. Best Alpha = 1, Best Beta = 10, Training MSE = 0.637987
+wine_red experiment (Gaussian basis) completed. Best Alpha = 10, Best Beta = 10, Training MSE = 0.637497
+Wine Quality (Red) best basis: Polynomial with Training MSE = 0.397138
+=== Running Forest Fires Regression Experiments with All Basis Functions ===
+forestfires experiment (Polynomial basis) completed. Best Alpha = 10, Best Beta = 10, Training MSE = 3287.19
+forestfires experiment (Sigmoidal basis) completed. Best Alpha = 10, Best Beta = 100, Training MSE = 3440.11
+forestfires experiment (Gaussian basis) completed. Best Alpha = 10, Best Beta = 10, Training MSE = 3434.05
+Forest Fires best basis: Polynomial with Training MSE = 3287.19
+All experiments completed. Check the './results/' folder for outputs.
