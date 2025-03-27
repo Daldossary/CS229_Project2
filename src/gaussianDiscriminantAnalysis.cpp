@@ -105,6 +105,10 @@ void GaussianDiscriminantAnalysis::fit(const Matrix &X, const vector<int> &y) {
     }
     // Divide by m.
     covariance_ = scaleMatrix(cov, 1.0 / m);
+
+    for (size_t i = 0; i < covariance_.size(); i++) {
+        covariance_[i][i] += 1e-6;  // add a small constant (e.g. 1e-6)
+    }
 }
 
 vector<int> GaussianDiscriminantAnalysis::predict(const Matrix &X) const {

@@ -33,12 +33,17 @@ public:
 
     // Return the learned weight vector.
     vector<double> getWeights() const;
+    
+    // NEW: Return the cost (error) history recorded during training.
+    vector<double> getCostHistory() const;
 
 private:
     vector<double> weights_;   // Weight vector.
     double learning_rate_;     // Learning rate for gradient descent.
     int max_iter_;             // Maximum number of iterations.
     double tol_;               // Tolerance for convergence.
+    
+    vector<double> cost_history_;   // Stores cross-entropy cost at each iteration.
 
     // Compute the logistic (sigmoid) of z.
     double sigmoid(double z) const;

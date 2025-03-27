@@ -18,7 +18,6 @@ double LogisticRegression::computeCost(const Matrix &X, const vector<int> &y) co
             z += X[i][j] * weights_[j];
         }
         double p = sigmoid(z);
-        // To avoid log(0) issues, we can add a tiny value (epsilon)
         const double epsilon = 1e-10;
         cost += y[i] * std::log(p + epsilon) + (1 - y[i]) * std::log(1 - p + epsilon);
     }
@@ -30,6 +29,7 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
     if (m == 0) return;
     size_t d = X[0].size();
     weights_.assign(d, 0.0); // initialize weights to zero
+    cost_history_.clear();
 
     double prev_cost = 1e12;
     for (int iter = 0; iter < max_iter_; iter++) {
@@ -46,7 +46,7 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
                 gradients[j] += error * X[i][j];
             }
         }
-        // Update weights (using average gradient over the data set)
+        // Update weights
         double max_update = 0.0;
         for (size_t j = 0; j < d; j++) {
             double update = learning_rate_ * gradients[j] / m;
@@ -55,10 +55,10 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
                 max_update = std::abs(update);
             }
         }
-        // Optionally compute cost for convergence monitoring
+        // Compute and record the cost
         double cost = computeCost(X, y);
-        // Uncomment the following line for debugging/monitoring:
-        // std::cout << "Iteration " << iter << " Cost: " << cost << std::endl;
+        cost_history_.push_back(cost);
+        // Optionally check for convergence
         if (std::abs(prev_cost - cost) < tol_) {
             break;
         }
@@ -91,4 +91,8 @@ vector<int> LogisticRegression::predict(const Matrix &X) const {
 
 vector<double> LogisticRegression::getWeights() const {
     return weights_;
+}
+
+vector<double> LogisticRegression::getCostHistory() const {
+    return cost_history_;
 }
