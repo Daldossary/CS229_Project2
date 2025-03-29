@@ -1,0 +1,9 @@
+Experiment,Method,Accuracy
+Synthetic,poly,86
+Synthetic,sigmoid,69
+Synthetic,gaussian,74.5
+Iris,poly,94
+Iris,sigmoid,50
+Iris,gaussian,100
+Titanic,LR,69.0299
+Titanic,GDA,67.9104

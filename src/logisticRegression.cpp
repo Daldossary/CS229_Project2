@@ -28,13 +28,12 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
     size_t m = X.size();
     if (m == 0) return;
     size_t d = X[0].size();
-    weights_.assign(d, 0.0); // initialize weights to zero
+    weights_.assign(d, 0.0);
     cost_history_.clear();
 
     double prev_cost = 1e12;
     for (int iter = 0; iter < max_iter_; iter++) {
         vector<double> gradients(d, 0.0);
-        // Compute gradients
         for (size_t i = 0; i < m; i++) {
             double z = 0.0;
             for (size_t j = 0; j < d; j++) {
@@ -46,7 +45,6 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
                 gradients[j] += error * X[i][j];
             }
         }
-        // Update weights
         double max_update = 0.0;
         for (size_t j = 0; j < d; j++) {
             double update = learning_rate_ * gradients[j] / m;
@@ -55,10 +53,8 @@ void LogisticRegression::fit(const Matrix &X, const vector<int> &y) {
                 max_update = std::abs(update);
             }
         }
-        // Compute and record the cost
         double cost = computeCost(X, y);
         cost_history_.push_back(cost);
-        // Optionally check for convergence
         if (std::abs(prev_cost - cost) < tol_) {
             break;
         }

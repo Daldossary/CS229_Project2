@@ -3,13 +3,12 @@
 #include <vector>
 #include <random>
 #include "./src/logisticRegression.h"
-#include "./src/polyReg.h"  // For genPolyFeatures (for basis expansion)
+#include "./src/polyReg.h"
 using std::cout;
 using std::endl;
 using std::vector;
 using Matrix = std::vector<std::vector<double>>;
 
-// Helper function: compute classification accuracy (percentage)
 double computeAccuracy(const vector<int>& y_true, const vector<int>& y_pred) {
     if (y_true.empty()) return 0.0;
     int correct = 0;
@@ -23,9 +22,6 @@ double computeAccuracy(const vector<int>& y_true, const vector<int>& y_pred) {
 int main() {
     cout << "Testing Logistic Regression for Binary Classification" << endl;
     
-    // Generate a synthetic univariate dataset:
-    // Create 100 data points uniformly in [0, 10]. The true rule is:
-    // if x > 5 then label = 1, else 0.
     const int N = 100;
     vector<vector<double>> X;
     vector<int> y;
@@ -39,26 +35,21 @@ int main() {
         y.push_back(label);
     }
     
-    // Optionally, apply a basis expansion (here we use a polynomial basis of degree 2)
     int degree = 2;
     Matrix Phi = genPolyFeatures(X, degree);
     
-    // Create and train the logistic regression model.
     double learning_rate = 0.001;
     int max_iter = 1000;
     double tol = 1e-6;
     LogisticRegression logReg(learning_rate, max_iter, tol);
     logReg.fit(Phi, y);
     
-    // Predict probabilities and binary labels on the training data.
     vector<double> probs = logReg.predictProb(Phi);
     vector<int> preds = logReg.predict(Phi);
     
-    // Compute and display accuracy.
     double accuracy = computeAccuracy(y, preds);
     cout << "Training Accuracy: " << accuracy << "%" << endl;
     
-    // Write predictions along with true labels and input values to a CSV file.
     std::ofstream predFile("./results/logistic_regression_predictions.csv");
     if (!predFile) {
         cout << "Error: Unable to open logistic_regression_predictions.csv for writing." << endl;
@@ -70,7 +61,6 @@ int main() {
     }
     predFile.close();
     
-    // Write the learned weight vector to a CSV file.
     vector<double> weights = logReg.getWeights();
     std::ofstream weightFile("./results/logistic_regression_weights.csv");
     if (!weightFile) {
