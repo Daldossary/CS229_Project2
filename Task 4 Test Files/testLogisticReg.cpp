@@ -258,102 +258,102 @@ void runIrisExperiment()
     runLRandOutput("gaussian", Phi_gauss);
 }
 
-void runTitanicExperiment() {
-    cout << "=== Running Titanic Experiment (Split-Version) ===" << endl;
+// void runTitanicExperiment() {
+//     cout << "=== Running Titanic Experiment (Split-Version) ===" << endl;
     
-    std::ifstream file("./datasets/Titanic_Classification/train_Titanic.csv");
-    if (!file.is_open()) {
-        cerr << "Error: Unable to open train_Titanic.csv" << endl;
-        return;
-    }
-    string line;
-    std::getline(file, line);
+//     std::ifstream file("./datasets/Titanic_Classification/train_Titanic.csv");
+//     if (!file.is_open()) {
+//         cerr << "Error: Unable to open train_Titanic.csv" << endl;
+//         return;
+//     }
+//     string line;
+//     std::getline(file, line);
 
-    Matrix X;
-    vector<int> y;
-    while (std::getline(file, line)) {
-        if (line.empty()) continue;
-        vector<string> tokens = parseCSVLine(line);
-        if (tokens.size() < 12) continue;
-        try {
-            int survived = std::stoi(tokens[1]);
-            double pclass = std::stod(tokens[2]);
-            double age = tokens[5].empty() ? 0.0 : std::stod(tokens[5]);
-            double fare = tokens[9].empty() ? 0.0 : std::stod(tokens[9]);
-            X.push_back({pclass, age, fare});
-            y.push_back(survived);
-        } catch (...) {
-            continue;
-        }
-    }
-    file.close();
+//     Matrix X;
+//     vector<int> y;
+//     while (std::getline(file, line)) {
+//         if (line.empty()) continue;
+//         vector<string> tokens = parseCSVLine(line);
+//         if (tokens.size() < 12) continue;
+//         try {
+//             int survived = std::stoi(tokens[1]);
+//             double pclass = std::stod(tokens[2]);
+//             double age = tokens[5].empty() ? 0.0 : std::stod(tokens[5]);
+//             double fare = tokens[9].empty() ? 0.0 : std::stod(tokens[9]);
+//             X.push_back({pclass, age, fare});
+//             y.push_back(survived);
+//         } catch (...) {
+//             continue;
+//         }
+//     }
+//     file.close();
     
-    if (X.empty()) {
-        cerr << "No valid Titanic data was loaded." << endl;
-        return;
-    }
+//     if (X.empty()) {
+//         cerr << "No valid Titanic data was loaded." << endl;
+//         return;
+//     }
     
-    size_t total = X.size();
-    vector<size_t> indices(total);
-    std::iota(indices.begin(), indices.end(), 0);
-    std::shuffle(indices.begin(), indices.end(), std::default_random_engine(42));
+//     size_t total = X.size();
+//     vector<size_t> indices(total);
+//     std::iota(indices.begin(), indices.end(), 0);
+//     std::shuffle(indices.begin(), indices.end(), std::default_random_engine(42));
     
-    size_t trainSize = static_cast<size_t>(total * 0.7);
-    Matrix X_train, X_test;
-    vector<int> y_train, y_test;
-    for (size_t i = 0; i < indices.size(); i++) {
-        if (i < trainSize) {
-            X_train.push_back(X[indices[i]]);
-            y_train.push_back(y[indices[i]]);
-        } else {
-            X_test.push_back(X[indices[i]]);
-            y_test.push_back(y[indices[i]]);
-        }
-    }
+//     size_t trainSize = static_cast<size_t>(total * 0.7);
+//     Matrix X_train, X_test;
+//     vector<int> y_train, y_test;
+//     for (size_t i = 0; i < indices.size(); i++) {
+//         if (i < trainSize) {
+//             X_train.push_back(X[indices[i]]);
+//             y_train.push_back(y[indices[i]]);
+//         } else {
+//             X_test.push_back(X[indices[i]]);
+//             y_test.push_back(y[indices[i]]);
+//         }
+//     }
     
-    cout << "Titanic dataset: " << total << " samples; " 
-         << X_train.size() << " training, " 
-         << X_test.size() << " testing." << endl;
+//     cout << "Titanic dataset: " << total << " samples; " 
+//          << X_train.size() << " training, " 
+//          << X_test.size() << " testing." << endl;
     
-    Matrix Phi_train = genPolyFeatures(X_train, 1);
-    Matrix Phi_test = genPolyFeatures(X_test, 1);
+//     Matrix Phi_train = genPolyFeatures(X_train, 1);
+//     Matrix Phi_test = genPolyFeatures(X_test, 1);
     
-    LogisticRegression lr(0.01, 10000, 1e-6);
-    lr.fit(Phi_train, y_train);
-    vector<int> preds_lr = lr.predict(Phi_test);
-    double acc_lr = computeAccuracy(y_test, preds_lr);
-    cout << "Titanic Logistic Regression Accuracy: " << acc_lr << "%" << endl;
-    appendSummaryResult("Titanic", "LR", acc_lr);
+//     LogisticRegression lr(0.01, 10000, 1e-6);
+//     lr.fit(Phi_train, y_train);
+//     vector<int> preds_lr = lr.predict(Phi_test);
+//     double acc_lr = computeAccuracy(y_test, preds_lr);
+//     cout << "Titanic Logistic Regression Accuracy: " << acc_lr << "%" << endl;
+//     appendSummaryResult("Titanic", "LR", acc_lr);
     
-    {
-        std::ofstream out("./results/titanic_lr_predictions.csv");
-        out << "Pclass,Age,Fare,true_label,predicted_label\n";
-        for (size_t i = 0; i < X_test.size(); i++) {
-            out << X_test[i][0] << "," << X_test[i][1] << "," << X_test[i][2]
-                << "," << y_test[i] << "," << preds_lr[i] << "\n";
-        }
-    }
-    vector<vector<int>> cm_lr = confusionMatrix(y_test, preds_lr);
-    writeMatrixToCSV("./results/titanic_lr_confusion_matrix.csv", cm_lr);
+//     {
+//         std::ofstream out("./results/titanic_lr_predictions.csv");
+//         out << "Pclass,Age,Fare,true_label,predicted_label\n";
+//         for (size_t i = 0; i < X_test.size(); i++) {
+//             out << X_test[i][0] << "," << X_test[i][1] << "," << X_test[i][2]
+//                 << "," << y_test[i] << "," << preds_lr[i] << "\n";
+//         }
+//     }
+//     vector<vector<int>> cm_lr = confusionMatrix(y_test, preds_lr);
+//     writeMatrixToCSV("./results/titanic_lr_confusion_matrix.csv", cm_lr);
     
-    GaussianDiscriminantAnalysis gda;
-    gda.fit(X_train, y_train);
-    vector<int> preds_gda = gda.predict(X_test);
-    double acc_gda = computeAccuracy(y_test, preds_gda);
-    cout << "Titanic GDA Accuracy: " << acc_gda << "%" << endl;
-    appendSummaryResult("Titanic", "GDA", acc_gda);
+//     GaussianDiscriminantAnalysis gda;
+//     gda.fit(X_train, y_train);
+//     vector<int> preds_gda = gda.predict(X_test);
+//     double acc_gda = computeAccuracy(y_test, preds_gda);
+//     cout << "Titanic GDA Accuracy: " << acc_gda << "%" << endl;
+//     appendSummaryResult("Titanic", "GDA", acc_gda);
     
-    {
-        std::ofstream out("./results/titanic_gda_predictions.csv");
-        out << "Pclass,Age,Fare,true_label,predicted_label\n";
-        for (size_t i = 0; i < X_test.size(); i++) {
-            out << X_test[i][0] << "," << X_test[i][1] << "," << X_test[i][2]
-                << "," << y_test[i] << "," << preds_gda[i] << "\n";
-        }
-    }
-    vector<vector<int>> cm_gda = confusionMatrix(y_test, preds_gda);
-    writeMatrixToCSV("./results/titanic_gda_confusion_matrix.csv", cm_gda);
-}
+//     {
+//         std::ofstream out("./results/titanic_gda_predictions.csv");
+//         out << "Pclass,Age,Fare,true_label,predicted_label\n";
+//         for (size_t i = 0; i < X_test.size(); i++) {
+//             out << X_test[i][0] << "," << X_test[i][1] << "," << X_test[i][2]
+//                 << "," << y_test[i] << "," << preds_gda[i] << "\n";
+//         }
+//     }
+//     vector<vector<int>> cm_gda = confusionMatrix(y_test, preds_gda);
+//     writeMatrixToCSV("./results/titanic_gda_confusion_matrix.csv", cm_gda);
+// }
 
 int main()
 {
@@ -361,6 +361,6 @@ int main()
     
     runSyntheticExperiment();
     runIrisExperiment();
-    runTitanicExperiment();
+    // runTitanicExperiment();
     return 0;
 }
